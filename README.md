@@ -8,6 +8,12 @@ returns the result.
 
 Also listed in the MCP Registry as `io.github.afmontoya/baconservices-mcp`.
 
+## Wallet safety
+
+Your wallet private key stays on your machine. Bacon Services never receives or stores it.
+Payments are signed locally and are subject to configurable per-call, session, and daily
+spending limits.
+
 ## What it sells
 
 | Tool | Does | Price (2026-10-17) |
@@ -184,6 +190,20 @@ npm test
 The tests run against a fake Bacon that checks every payment signature for real. Nothing reaches
 a network.
 
+## Hosted services
+
+This MCP client is open source under the MIT License. Bacon Services' hosted APIs, Agent
+Commerce services, x402-paid capabilities, infrastructure, and backend implementations are
+separate services and are not licensed under the MIT License. Use of Bacon Services' hosted
+APIs and x402 services is governed by the [Bacon Services terms](https://baconservices.com/terms).
+
+## Trademark notice
+
+The MIT License applies to the source code in this repository only. "Bacon Services," the
+Bacon Services name, logos, and associated branding are not licensed under the MIT License. No
+permission is granted to use Bacon Services trademarks, logos, or branding in a way that
+suggests endorsement, sponsorship, or affiliation. See [TRADEMARKS.md](TRADEMARKS.md).
+
 ## License
 
-MIT
+MIT. See [LICENSE](LICENSE).

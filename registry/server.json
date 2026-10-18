@@ -3,7 +3,7 @@
   "name": "io.github.afmontoya/baconservices-mcp",
   "title": "Bacon Services",
   "description": "Pay-per-call image tools for agents: remove backgrounds, optimize for web. USDC on Base via x402.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "websiteUrl": "https://baconservices.com",
   "repository": {
     "url": "https://github.com/afmontoya/baconservices-mcp",
@@ -14,7 +14,7 @@
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "baconservices-mcp",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "transport": {
         "type": "stdio"
       },

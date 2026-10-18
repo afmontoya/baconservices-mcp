@@ -14,7 +14,7 @@ import { formatUsdc } from './money.js';
 import { Purchaser, Refusal } from './payment.js';
 import { balanceReader, loadWallet, redact } from './wallet.js';
 
-export const VERSION = '0.1.0';
+export const VERSION = '0.1.1';
 const CATALOG_TTL_MS = 5 * 60 * 1000;
 
 const FREE_TOOLS = [
