@@ -1,0 +1,50 @@
+{
+  "name": "baconservices-mcp",
+  "version": "0.1.0",
+  "description": "MCP server that lets an AI agent buy Bacon Services image operations (remove background, optimize for the web) per call in USDC over x402, with local spending limits.",
+  "mcpName": "io.github.afmontoya/baconservices-mcp",
+  "type": "module",
+  "bin": {
+    "baconservices-mcp": "bin/baconservices-mcp.js"
+  },
+  "main": "src/server.js",
+  "files": [
+    "bin",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test --test-concurrency=1 \"test/*.test.js\""
+  },
+  "keywords": [
+    "mcp",
+    "x402",
+    "usdc",
+    "base",
+    "remove-background",
+    "image-optimization",
+    "agent-payments"
+  ],
+  "homepage": "https://baconservices.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/afmontoya/baconservices-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/afmontoya/baconservices-mcp/issues"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "@x402/core": "2.28.0",
+    "@x402/evm": "2.28.0",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
+    "viem": "2.57.7",
+    "zod": "3.25.76"
+  }
+}

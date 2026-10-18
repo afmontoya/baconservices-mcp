@@ -1,0 +1,70 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.afmontoya/baconservices-mcp",
+  "title": "Bacon Services",
+  "description": "Pay-per-call image tools for agents: remove backgrounds, optimize for web. USDC on Base via x402.",
+  "version": "0.1.0",
+  "websiteUrl": "https://baconservices.com",
+  "repository": {
+    "url": "https://github.com/afmontoya/baconservices-mcp",
+    "source": "github"
+  },
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "baconservices-mcp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "BACON_WALLET_KEY_FILE",
+          "description": "Path to a file holding the buyer wallet's private key (USDC on Base). Or set BACON_WALLET_PRIVATE_KEY.",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "BACON_WALLET_PRIVATE_KEY",
+          "description": "The buyer wallet's private key, if not using a key file. Use a dedicated wallet.",
+          "isRequired": false,
+          "isSecret": true
+        },
+        {
+          "name": "BACON_MAX_PER_CALL",
+          "description": "Largest single payment in USDC.",
+          "isRequired": false,
+          "isSecret": false,
+          "default": "0.50"
+        },
+        {
+          "name": "BACON_MAX_PER_SESSION",
+          "description": "Most this process may spend, in USDC.",
+          "isRequired": false,
+          "isSecret": false,
+          "default": "1.00"
+        },
+        {
+          "name": "BACON_MAX_PER_DAY",
+          "description": "Most spent in any rolling 24 hours, persisted across restarts, in USDC.",
+          "isRequired": false,
+          "isSecret": false,
+          "default": "5.00"
+        },
+        {
+          "name": "BACON_CONFIRM",
+          "description": "auto, always or never: ask before each payment when the host can.",
+          "isRequired": false,
+          "isSecret": false,
+          "default": "auto",
+          "choices": [
+            "auto",
+            "always",
+            "never"
+          ]
+        }
+      ]
+    }
+  ]
+}

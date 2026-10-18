@@ -1,0 +1,2 @@
+# npm publishes the working files as they are: keep LF so the bin shebang works on macOS/Linux.
+* text=auto eol=lf
