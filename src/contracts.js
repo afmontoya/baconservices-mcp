@@ -4,7 +4,7 @@
 // package will EXECUTE. A capability becomes a paid tool only when its catalog entry matches one
 // of these contracts exactly. A contract is the capability id, its behaviour `version`, its
 // `input_version` and `output_version`, an input type (one image, or one web page URL) with the
-// same option names, types and bounds, an output (an artifact file of one MIME type, or a JSON
+// same option names, types, bounds and allowed values, an output (an artifact file of one MIME type, or a JSON
 // result), synchronous execution, and declared limits. Anything else — a new capability, a new
 // version, a changed schema, a catalog contract_version this package does not know — is still
 // shown by list_services, but is not executable until a package release that knows it.
@@ -81,6 +81,22 @@ export const CONTRACTS = [
         output: { kind: 'json', mime: 'application/json' },
         execution: 'sync',
     },
+    {
+        tool: 'vectorize_image',
+        id: 'vectorize',
+        version: 1,
+        inputVersion: 1,
+        outputVersion: 1,
+        title: 'Vectorize image',
+        summary: 'Traces one PNG, JPEG or WebP image into an SVG of filled paths with up to colors flat colours. Best for logos, icons and flat artwork; a photo comes back as a stylised poster. The SVG keeps the image\'s width and height (capped at 4096).',
+        input: 'image',
+        options: {
+            colors: { type: 'integer', minimum: 2, maximum: 32, default: 16, description: 'How many flat colours to trace with. 2 is black and white.' },
+            detail: { type: 'string', enum: ['smooth', 'balanced', 'detailed'], default: 'balanced', description: 'smooth: fewer, simpler shapes. detailed: closer to the source, larger file.' },
+        },
+        output: { kind: 'artifact', mime: 'image/svg+xml' },
+        execution: 'sync',
+    },
 ];
 
 export function contractId(id, version) {
@@ -149,8 +165,10 @@ export function checkEntry(entry, contract, expected) {
         reasons.push(`input properties are [${names}], expected [${Object.keys(expectedProperties).sort().join(',')}]`);
     } else {
         for (const [name, want] of Object.entries(expectedProperties)) {
-            for (const key of ['type', 'minimum', 'maximum', 'default']) {
-                if (want[key] !== properties[name][key]) {
+            for (const key of ['type', 'minimum', 'maximum', 'default', 'enum']) {
+                // An enum is compared whole: the same values in the same order.
+                const same = key === 'enum' ? JSON.stringify(want[key]) === JSON.stringify(properties[name][key]) : want[key] === properties[name][key];
+                if (!same) {
                     reasons.push(`input ${name}.${key} is ${JSON.stringify(properties[name][key])}, expected ${JSON.stringify(want[key])}`);
                 }
             }

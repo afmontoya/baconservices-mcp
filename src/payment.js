@@ -567,7 +567,7 @@ export function prepareUrl(args, inputSchema) {
     return { body: { url: url.href }, identity: `page:${url.href}` };
 }
 
-/** The contract's options, defaults filled in: integers within their bounds, booleans as booleans. */
+/** The contract's options, defaults filled in: integers within their bounds, booleans as booleans, named values from their list. */
 export function prepareOptions(args, contract) {
     const options = {};
     for (const [name, spec] of Object.entries(contract.options)) {
@@ -575,6 +575,10 @@ export function prepareOptions(args, contract) {
         if (spec.type === 'boolean') {
             if (typeof value !== 'boolean') {
                 throw new Refusal(`${name} must be true or false.`);
+            }
+        } else if (spec.enum) {
+            if (!spec.enum.includes(value)) {
+                throw new Refusal(`${name} must be one of: ${spec.enum.join(', ')}.`);
             }
         } else if (!Number.isInteger(value) || value < spec.minimum || value > spec.maximum) {
             throw new Refusal(`${name} must be a whole number from ${spec.minimum} to ${spec.maximum}.`);

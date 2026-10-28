@@ -15,10 +15,10 @@ const names = async (client) => (await client.listTools()).tools.map((t) => t.na
 const ledgerOf = (dir) => JSON.parse(readFileSync(join(dir, 'spend-ledger.json'), 'utf8')).entries;
 const SITE = { url: 'https://example.com/' };
 
-test('a contract-v1 catalog makes all four known services tools, each stating its price and output', async () => {
+test('a contract-v1 catalog makes all five known services tools, each stating its price and output', async () => {
     const { client } = await connect({ fake: v1() });
     const { tools } = await client.listTools();
-    assert.deepEqual(tools.map((t) => t.name), ['list_services', 'quote', 'wallet_status', 'remove_background', 'optimize_image', 'image_palette', 'brand_from_url']);
+    assert.deepEqual(tools.map((t) => t.name), ['list_services', 'quote', 'wallet_status', 'remove_background', 'optimize_image', 'image_palette', 'brand_from_url', 'vectorize_image']);
     const brand = tools.find((t) => t.name === 'brand_from_url');
     assert.match(brand.description, /Costs 0\.03 USDC per call \(real money\) on Base/);
     assert.match(brand.description, /Output: JSON, returned in the tool result\./);

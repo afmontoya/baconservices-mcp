@@ -1,0 +1,97 @@
+{
+  "manifest_version": "0.3",
+  "name": "baconservices-mcp",
+  "display_name": "Bacon Services",
+  "version": "0.2.0",
+  "description": "Pay-per-call image tools for agents, in USDC on Base over x402, with local spending limits.",
+  "long_description": "Let your agent remove backgrounds, optimize images for the web, read an image's colour palette, read a company's brand from its website and turn a logo into an SVG, without an account or API key. It pays per call in USDC on Base over x402, from your own wallet.\n\n- `remove_background`: transparent PNG at the photo's size, 0.20 USDC\n- `optimize_image`: resize + WebP, 0.01 USDC\n- `image_palette`: an image's dominant colours as JSON, 0.01 USDC\n- `brand_from_url`: a public web page's brand kit (name, logos, colours, fonts, social) as JSON, 0.03 USDC\n- `vectorize_image`: a logo, icon or flat artwork traced into an SVG of flat-colour paths, 0.05 USDC\n- `list_services`, `quote`, `wallet_status`: free\n\nPrices come from Bacon's live catalog. Your key stays on your machine. Before any payment the server checks the price against Bacon's live catalog and verifies the payee. It enforces your per-call, per-session and daily limits; the daily limit persists across restarts. Where the client supports it, you're asked to approve each payment. Use a dedicated wallet holding only what you are willing to spend.",
+  "author": {
+    "name": "Bacon Services",
+    "url": "https://baconservices.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/afmontoya/baconservices-mcp.git"
+  },
+  "homepage": "https://baconservices.com",
+  "support": "https://github.com/afmontoya/baconservices-mcp/issues",
+  "icon": "icon.png",
+  "license": "MIT",
+  "keywords": ["x402", "usdc", "base", "remove-background", "image-optimization", "color-palette", "brand-kit", "svg", "vectorize", "agent-payments"],
+  "privacy_policies": ["https://baconservices.com/privacy"],
+  "server": {
+    "type": "node",
+    "entry_point": "bin/baconservices-mcp.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/bin/baconservices-mcp.js"],
+      "env": {
+        "BACON_WALLET_KEY_FILE": "${user_config.wallet_key_file}",
+        "BACON_WALLET_PRIVATE_KEY": "${user_config.wallet_private_key}",
+        "BACON_MAX_PER_CALL": "${user_config.max_per_call}",
+        "BACON_MAX_PER_SESSION": "${user_config.max_per_session}",
+        "BACON_MAX_PER_DAY": "${user_config.max_per_day}",
+        "BACON_CONFIRM": "${user_config.confirm}"
+      }
+    }
+  },
+  "user_config": {
+    "wallet_key_file": {
+      "type": "file",
+      "title": "Wallet key file",
+      "description": "A file holding the buyer wallet's private key (USDC on Base). Preferred: the key then never sits in the app's settings. Set this or the private key below, not both. Without either, only the free tools work.",
+      "required": false
+    },
+    "wallet_private_key": {
+      "type": "string",
+      "title": "Wallet private key",
+      "description": "The buyer wallet's private key, if not using a key file. Use a dedicated wallet holding only what you are willing to spend.",
+      "sensitive": true,
+      "required": false
+    },
+    "max_per_call": {
+      "type": "string",
+      "title": "Most per call (USDC)",
+      "description": "Largest single payment, in USDC.",
+      "required": false,
+      "default": "0.50"
+    },
+    "max_per_session": {
+      "type": "string",
+      "title": "Most per session (USDC)",
+      "description": "Most this process may spend, in USDC.",
+      "required": false,
+      "default": "1.00"
+    },
+    "max_per_day": {
+      "type": "string",
+      "title": "Most per day (USDC)",
+      "description": "Most spent in any rolling 24 hours, persisted across restarts, in USDC.",
+      "required": false,
+      "default": "5.00"
+    },
+    "confirm": {
+      "type": "string",
+      "title": "Ask before paying",
+      "description": "auto, always or never: ask before each payment when the app can.",
+      "required": false,
+      "default": "auto"
+    }
+  },
+  "tools": [
+    { "name": "list_services", "description": "Everything Bacon sells right now, with prices, limits, and whether this version can run it. Free." },
+    { "name": "quote", "description": "Bacon's current price for one service, and whether your limits and wallet allow it. Free." },
+    { "name": "wallet_status", "description": "The payment network, whether a wallet is configured, your spending limits and what is left of them, and whether the wallet can afford each service. Free." },
+    { "name": "remove_background", "description": "Removes the background from one photo; a transparent PNG at the photo's size. Paid." },
+    { "name": "optimize_image", "description": "Resizes one image and encodes it as WebP. Paid." },
+    { "name": "image_palette", "description": "The colours one image is mostly made of, as JSON. Paid." },
+    { "name": "brand_from_url", "description": "Reads one public web page and returns its brand as JSON: name, logos, colours, fonts, social profiles. Paid." },
+    { "name": "vectorize_image", "description": "Traces one image into an SVG of flat-colour paths. Paid." }
+  ],
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {
+      "node": ">=20.0.0"
+    }
+  }
+}

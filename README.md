@@ -22,15 +22,16 @@ spending limits.
 | `optimize_image` | Resizes so the longest side ≤ `max_width` (64–4096, default 1600) and encodes WebP at `quality` (40–95, default 80) | 0.01 USDC |
 | `image_palette` | The colours one image is mostly made of, as JSON: up to `count` (1–12, default 6) hex colours with their share, `include_neutrals` (default true) | 0.01 USDC |
 | `brand_from_url` | Reads one public web page (`url`) and returns its brand as JSON: name, description, logo URLs, colours, fonts, social profiles. No JavaScript runs; robots.txt is respected | 0.03 USDC |
+| `vectorize_image` | Traces one image into an SVG of flat-colour paths: `colors` (2–32, default 16), `detail` (`smooth`, `balanced` or `detailed`, default `balanced`). Best for logos and icons | 0.05 USDC |
 
 Image tools take PNG, JPEG or WebP up to 8 MB, as `image_url` (public https) or `image_path` (a
-local file). `remove_background` and `optimize_image` return a signed download link (valid 24
-hours); `image_palette` and `brand_from_url` return their JSON result in the tool result. Add
+local file). `remove_background`, `optimize_image` and `vectorize_image` return a signed download
+link (valid 24 hours); `image_palette` and `brand_from_url` return their JSON result in the tool result. Add
 `save_to` to write either kind to disk. Prices come from Bacon's live catalog, and each paid tool
 states its current price in its description.
 
-`image_palette` and `brand_from_url` appear once Bacon's catalog publishes them with contract
-versions. A service the installed package doesn't understand is listed by `list_services` but
+`image_palette`, `brand_from_url` and `vectorize_image` appear once Bacon's catalog publishes
+them with contract versions. A service the installed package doesn't understand is listed by `list_services` but
 can't be called until you update the package.
 
 Free tools:
@@ -196,6 +197,12 @@ This MCP client is open source under the MIT License. Bacon Services' hosted API
 Commerce services, x402-paid capabilities, infrastructure, and backend implementations are
 separate services and are not licensed under the MIT License. Use of Bacon Services' hosted
 APIs and x402 services is governed by the [Bacon Services terms](https://baconservices.com/terms).
+
+## Support
+
+For MCP, x402, or Agent Commerce support, contact Bacon Services:
+https://baconservices.com/contact?topic=mcp. Please never send a wallet private key. Bugs in
+this package can also be reported as issues on its repository.
 
 ## Trademark notice
 

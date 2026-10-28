@@ -14,6 +14,7 @@ import { NETWORKS } from '../src/networks.js';
 
 export const PNG = Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), Buffer.from('fake png body')]);
 export const WEBP = Buffer.concat([Buffer.from('RIFF'), Buffer.from([0, 0, 0, 0]), Buffer.from('WEBPfake webp body')]);
+export const SVG = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 800 600" width="800" height="600"><path fill="rgb(1,2,3)" d="M 0 0 L 8 0 Z "/></svg>');
 
 const FIXTURES = {
     legacy: JSON.parse(readFileSync(new URL('./fixtures/catalog-legacy.json', import.meta.url), 'utf8')),
@@ -135,7 +136,7 @@ export function createFakeBacon({ networkKey = 'base', apiUrl = 'https://baconse
             // A JSON result inline, as Bacon's deliveredJson() answers: the catalog's own example unless a test overrides it.
             body = { ok: true, request_id: requestId, capability: id, result: fake.tweak.jsonResult ?? listed.output.example, payment: receiptInfo };
         } else {
-            const mime = id === 'remove-background' ? 'image/png' : 'image/webp';
+            const mime = listed?.output?.mime ?? (id === 'remove-background' ? 'image/png' : 'image/webp');
             body = {
                 ok: true,
                 request_id: requestId,
@@ -175,7 +176,8 @@ export function createFakeBacon({ networkKey = 'base', apiUrl = 'https://baconse
             if (!settledFor) {
                 return json(404, {});
             }
-            return new Response(settledFor.response.body.capability === 'remove-background' ? PNG : WEBP, { status: 200, headers: { 'Content-Type': settledFor.response.body.artifact.mime } });
+            const bytes = { 'image/png': PNG, 'image/svg+xml': SVG }[settledFor.response.body.artifact.mime] ?? WEBP;
+            return new Response(bytes, { status: 200, headers: { 'Content-Type': settledFor.response.body.artifact.mime } });
         }
         const match = /^\/api\/agent-commerce\/v1\/capabilities\/([a-z-]+)\/execute$/.exec(path);
         if (request.method === 'POST' && match) {

@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.afmontoya/baconservices-mcp",
   "title": "Bacon Services",
-  "description": "Pay-per-call image tools for agents: remove backgrounds, optimize for web. USDC on Base via x402.",
-  "version": "0.1.1",
+  "description": "Pay-per-call agent tools (USDC, x402): background removal, WebP, palettes, brand from URL, SVG.",
+  "version": "0.2.0",
   "websiteUrl": "https://baconservices.com",
   "repository": {
     "url": "https://github.com/afmontoya/baconservices-mcp",
@@ -14,7 +14,7 @@
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "baconservices-mcp",
-      "version": "0.1.1",
+      "version": "0.2.0",
       "transport": {
         "type": "stdio"
       },
