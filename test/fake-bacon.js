@@ -191,8 +191,9 @@ export function createFakeBacon({ networkKey = 'base', apiUrl = 'https://baconse
             if (Object.keys(body).length === 0 && !header) {
                 return paymentRequired(id, 'Send the image in the JSON body to get a quote for it.');
             }
-            if (id === 'brand-from-url') {
-                if (typeof body.url !== 'string' || Object.keys(body).length !== 1) {
+            if (id === 'brand-from-url' || id === 'page-metadata' || id === 'accessibility-check') {
+                const allowed = id === 'accessibility-check' ? ['url', 'standard', 'viewport'] : ['url'];
+                if (typeof body.url !== 'string' || Object.keys(body).some((key) => !allowed.includes(key))) {
                     return json(422, { ok: false, code: 'invalid_input', error: 'Give url.' });
                 }
                 if (fake.tweak.hostBusyAtQuote) {

@@ -18,19 +18,21 @@ spending limits.
 
 | Tool | Does | Price (2026-10-17) |
 |---|---|---|
-| `remove_background` | Removes the background from one photo; returns a transparent PNG at the photo's size | 0.20 USDC |
+| `remove_background` | Removes the background from one photo; returns a transparent PNG at the photo's size | 0.05 USDC |
 | `optimize_image` | Resizes so the longest side ≤ `max_width` (64–4096, default 1600) and encodes WebP at `quality` (40–95, default 80) | 0.01 USDC |
 | `image_palette` | The colours one image is mostly made of, as JSON: up to `count` (1–12, default 6) hex colours with their share, `include_neutrals` (default true) | 0.01 USDC |
 | `brand_from_url` | Reads one public web page (`url`) and returns its brand as JSON: name, description, logo URLs, colours, fonts, social profiles. No JavaScript runs; robots.txt is respected | 0.03 USDC |
+| `page_metadata` | Reads one public web page (`url`) and returns its SEO and link-preview metadata as JSON: title and description with lengths, canonical, redirects, robots rules, Open Graph and Twitter cards, headings, JSON-LD types, and a list of issues. Nothing it links to is fetched; robots.txt is respected | 0.01 USDC |
+| `accessibility_check` | An automated WCAG check of one public web page (`url`) with axe-core: `standard` (`wcag22aa` default, or `wcag21aa`), `viewport` (`desktop` default, or `mobile`). JSON: failing rules with WCAG criteria, element counts and examples, what needs review, and the criteria a person must test. The page's own scripts don't run. Not a certification of WCAG or ADA conformance | 0.05 USDC |
 | `vectorize_image` | Traces one image into an SVG of flat-colour paths: `colors` (2–32, default 16), `detail` (`smooth`, `balanced` or `detailed`, default `balanced`). Best for logos and icons | 0.05 USDC |
 
 Image tools take PNG, JPEG or WebP up to 8 MB, as `image_url` (public https) or `image_path` (a
 local file). `remove_background`, `optimize_image` and `vectorize_image` return a signed download
-link (valid 24 hours); `image_palette` and `brand_from_url` return their JSON result in the tool result. Add
+link (valid 24 hours); `image_palette`, `brand_from_url`, `page_metadata` and `accessibility_check` return their JSON result in the tool result. Add
 `save_to` to write either kind to disk. Prices come from Bacon's live catalog, and each paid tool
 states its current price in its description.
 
-`image_palette`, `brand_from_url` and `vectorize_image` appear once Bacon's catalog publishes
+`image_palette`, `brand_from_url`, `page_metadata`, `accessibility_check` and `vectorize_image` appear once Bacon's catalog publishes
 them with contract versions. A service the installed package doesn't understand is listed by `list_services` but
 can't be called until you update the package.
 
@@ -152,7 +154,7 @@ All of these checks happen before anything is signed:
   cap is set to your per-call limit as a second lock.
 - **Funds.** It reads your USDC balance first. If it's too low, or the balance can't be read,
   you get a plain message and nothing is signed.
-- **Your approval, where possible.** If the MCP host supports it, you're asked *"Pay 0.2 USDC on
+- **Your approval, where possible.** If the MCP host supports it, you're asked *"Pay 0.05 USDC on
   Base to Bacon Services to run remove_background?"* Not every host can ask, so the limits are
   the real boundary.
 - **No double payments.** Each purchase signs one payment for one request. If the connection drops,

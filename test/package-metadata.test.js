@@ -18,6 +18,8 @@ const NAMED_AS = {
     optimize_image: /WebP|optimi[sz]e/i,
     image_palette: /palette/i,
     brand_from_url: /brand/i,
+    page_metadata: /SEO/,
+    accessibility_check: /WCAG/,
     vectorize_image: /SVG/,
 };
 

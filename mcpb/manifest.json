@@ -2,9 +2,9 @@
   "manifest_version": "0.3",
   "name": "baconservices-mcp",
   "display_name": "Bacon Services",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Pay-per-call image tools for agents, in USDC on Base over x402, with local spending limits.",
-  "long_description": "Let your agent remove backgrounds, optimize images for the web, read an image's colour palette, read a company's brand from its website and turn a logo into an SVG, without an account or API key. It pays per call in USDC on Base over x402, from your own wallet.\n\n- `remove_background`: transparent PNG at the photo's size, 0.20 USDC\n- `optimize_image`: resize + WebP, 0.01 USDC\n- `image_palette`: an image's dominant colours as JSON, 0.01 USDC\n- `brand_from_url`: a public web page's brand kit (name, logos, colours, fonts, social) as JSON, 0.03 USDC\n- `vectorize_image`: a logo, icon or flat artwork traced into an SVG of flat-colour paths, 0.05 USDC\n- `list_services`, `quote`, `wallet_status`: free\n\nPrices come from Bacon's live catalog. Your key stays on your machine. Before any payment the server checks the price against Bacon's live catalog and verifies the payee. It enforces your per-call, per-session and daily limits; the daily limit persists across restarts. Where the client supports it, you're asked to approve each payment. Use a dedicated wallet holding only what you are willing to spend.",
+  "long_description": "Let your agent remove backgrounds, optimize images for the web, read an image's colour palette, read a company's brand from its website, check a page's SEO metadata, run an automated WCAG accessibility check and turn a logo into an SVG, without an account or API key. It pays per call in USDC on Base over x402, from your own wallet.\n\n- `remove_background`: transparent PNG at the photo's size, 0.20 USDC\n- `optimize_image`: resize + WebP, 0.01 USDC\n- `image_palette`: an image's dominant colours as JSON, 0.01 USDC\n- `brand_from_url`: a public web page's brand kit (name, logos, colours, fonts, social) as JSON, 0.03 USDC\n- `page_metadata`: a public web page's SEO and link-preview metadata (title, description, canonical, robots, Open Graph, headings, issues) as JSON, 0.01 USDC\n- `accessibility_check`: an automated WCAG 2.2 or 2.1 AA check of a public web page (axe-core) as JSON, with what a person still has to test; not a conformance certification, 0.05 USDC\n- `vectorize_image`: a logo, icon or flat artwork traced into an SVG of flat-colour paths, 0.05 USDC\n- `list_services`, `quote`, `wallet_status`: free\n\nPrices come from Bacon's live catalog. Your key stays on your machine. Before any payment the server checks the price against Bacon's live catalog and verifies the payee. It enforces your per-call, per-session and daily limits; the daily limit persists across restarts. Where the client supports it, you're asked to approve each payment. Use a dedicated wallet holding only what you are willing to spend.",
   "author": {
     "name": "Bacon Services",
     "url": "https://baconservices.com"
@@ -86,6 +86,8 @@
     { "name": "optimize_image", "description": "Resizes one image and encodes it as WebP. Paid." },
     { "name": "image_palette", "description": "The colours one image is mostly made of, as JSON. Paid." },
     { "name": "brand_from_url", "description": "Reads one public web page and returns its brand as JSON: name, logos, colours, fonts, social profiles. Paid." },
+    { "name": "page_metadata", "description": "Reads one public web page and returns its SEO and link-preview metadata as JSON, with a list of issues. Paid." },
+    { "name": "accessibility_check", "description": "An automated WCAG accessibility check of one public web page, as JSON. Not a conformance certification. Paid." },
     { "name": "vectorize_image", "description": "Traces one image into an SVG of flat-colour paths. Paid." }
   ],
   "compatibility": {
