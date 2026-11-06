@@ -1,7 +1,7 @@
 {
   "name": "baconservices-mcp",
-  "version": "0.3.0",
-  "description": "MCP server that lets an AI agent buy Bacon Services tools per call in USDC over x402: remove a background, optimize an image for the web, read an image's colour palette, read a brand from a URL, read a page's SEO metadata, run an automated WCAG accessibility check, trace an image into an SVG. With local spending limits.",
+  "version": "0.4.0",
+  "description": "MCP server that lets an AI agent buy Bacon Services tools per call in USDC over x402: remove a background, optimize an image for the web, read an image's colour palette, read a brand from a URL, read a page's SEO metadata, run an automated WCAG accessibility check, trace an image into an SVG, clean up an SVG. With local spending limits.",
   "mcpName": "io.github.afmontoya/baconservices-mcp",
   "type": "module",
   "bin": {

@@ -11,10 +11,10 @@ import { CONTRACTS } from './contracts.js';
 import { loadConfig } from './config.js';
 import { Ledger } from './ledger.js';
 import { formatUsdc } from './money.js';
-import { Purchaser, Refusal } from './payment.js';
+import { HARD_MAX_RESULT_BYTES, Purchaser, Refusal } from './payment.js';
 import { balanceReader, loadWallet, redact } from './wallet.js';
 
-export const VERSION = '0.3.0';
+export const VERSION = '0.4.0';
 const CATALOG_TTL_MS = 5 * 60 * 1000;
 
 const FREE_TOOLS = [
@@ -133,14 +133,24 @@ export function createBaconServer({ env = process.env, fetch = globalThis.fetch,
         const network = config.network;
         const options = Object.fromEntries(Object.entries(contract.options).map(([name, spec]) => [name, { ...spec }]));
         const price = `Costs ${service.price.usdc} USDC per call${network.testnet ? ' (test USDC)' : ' (real money)'} on ${network.label}, paid from the buyer's wallet over x402 after the buyer's spending limits are checked.`;
+        // A service may declare a larger JSON result than this package shows: say so before anyone pays.
+        const unshown = limits.max_response_bytes > HARD_MAX_RESULT_BYTES
+            ? ` A result over ${HARD_MAX_RESULT_BYTES / 1024} KB is not shown; pass save_to to keep it.` : '';
         const output = contract.output.kind === 'json'
-            ? 'Output: JSON, returned in the tool result.'
+            ? `Output: JSON, returned in the tool result.${unshown}`
             : `Output: ${contract.output.mime}, as a download link (and a file with save_to).`;
         let input;
         let source;
         if (contract.input === 'url') {
             input = 'Give url: one public web page (http or https, standard ports).';
             source = { url: { type: 'string', description: 'A public web page, usually the homepage.', maxLength: service.entry.input.properties.url.maxLength ?? 2048 } };
+        } else if (contract.input === 'svg') {
+            input = `Input: one SVG, up to ${Math.floor(limits.max_bytes / 1048576)} MB. Give exactly one of svg, svg_url or svg_path.`;
+            source = {
+                svg: { type: 'string', description: 'The SVG markup itself.' },
+                svg_url: { type: 'string', description: 'A public https URL of an SVG file.', maxLength: service.entry.input.properties.svg_url.maxLength ?? 2048 },
+                svg_path: { type: 'string', description: 'A local SVG file to send (read by this server as UTF-8 text).' },
+            };
         } else {
             const formats = limits.formats.map((f) => f.replace('image/', '').toUpperCase()).join(', ');
             input = `Input: ${formats}, up to ${Math.floor(limits.max_bytes / 1048576)} MB${limits.max_dimension ? `, at most ${limits.max_dimension} px` : ''}. Give exactly one of image_url or image_path.`;

@@ -24,15 +24,16 @@ spending limits.
 | `brand_from_url` | Reads one public web page (`url`) and returns its brand as JSON: name, description, logo URLs, colours, fonts, social profiles. No JavaScript runs; robots.txt is respected | 0.03 USDC |
 | `page_metadata` | Reads one public web page (`url`) and returns its SEO and link-preview metadata as JSON: title and description with lengths, canonical, redirects, robots rules, Open Graph and Twitter cards, headings, JSON-LD types, and a list of issues. Nothing it links to is fetched; robots.txt is respected | 0.01 USDC |
 | `accessibility_check` | An automated WCAG check of one public web page (`url`) with axe-core: `standard` (`wcag22aa` default, or `wcag21aa`), `viewport` (`desktop` default, or `mobile`). JSON: failing rules with WCAG criteria, element counts and examples, what needs review, and the criteria a person must test. The page's own scripts don't run. Not a certification of WCAG or ADA conformance | 0.05 USDC |
-| `vectorize_image` | Traces one image into an SVG of flat-colour paths: `colors` (2–32, default 16), `detail` (`smooth`, `balanced` or `detailed`, default `balanced`). Best for logos and icons | 0.05 USDC |
+| `vectorize_image` | Traces one image into an SVG of flat-colour paths: `colors` (2–32, default 16), `detail` (`smooth`, `balanced` or `detailed`, default `balanced`). Best for logos and icons; a photo's SVG is larger than the photo, and `colors` sets the size | 0.05 USDC |
+| `clean_svg` | Cleans and simplifies one SVG (`svg` markup, `svg_url` or `svg_path`, up to 1 MB) and returns it as JSON with a report. Rebuilt from an allowlist: scripts, event handlers, animation, links and outside references are removed; editor data, unused definitions and hidden or empty elements go; numbers are rounded to `precision` (1–6, default 3) and paths rewritten short. `simplify` (`none` default, `light`, `strong`) moves points on straight runs; `keep_ids` (default false) keeps ids and classes | 0.01 USDC |
 
 Image tools take PNG, JPEG or WebP up to 8 MB, as `image_url` (public https) or `image_path` (a
 local file). `remove_background`, `optimize_image` and `vectorize_image` return a signed download
-link (valid 24 hours); `image_palette`, `brand_from_url`, `page_metadata` and `accessibility_check` return their JSON result in the tool result. Add
-`save_to` to write either kind to disk. Prices come from Bacon's live catalog, and each paid tool
+link (valid 24 hours); `image_palette`, `brand_from_url`, `page_metadata`, `accessibility_check` and `clean_svg` return their JSON result in the tool result. Add
+`save_to` to write either kind to disk. A JSON result over 256 KB (a large cleaned SVG, say) is not shown, so pass `save_to` for one. Prices come from Bacon's live catalog, and each paid tool
 states its current price in its description.
 
-`image_palette`, `brand_from_url`, `page_metadata`, `accessibility_check` and `vectorize_image` appear once Bacon's catalog publishes
+`image_palette`, `brand_from_url`, `page_metadata`, `accessibility_check`, `vectorize_image` and `clean_svg` appear once Bacon's catalog publishes
 them with contract versions. A service the installed package doesn't understand is listed by `list_services` but
 can't be called until you update the package.
 

@@ -160,7 +160,9 @@ export class Purchaser {
         const endpoint = endpointFor(apiUrl, service.id);
 
         // 1. Input, options, destination and the caller's price ceiling: all before any request.
-        const image = contract.input === 'url' ? prepareUrl(args, service.entry.input) : prepareImage(args, service.entry.limits);
+        const image = contract.input === 'url' ? prepareUrl(args, service.entry.input)
+            : contract.input === 'svg' ? prepareSvg(args, service.entry)
+                : prepareImage(args, service.entry.limits);
         const options = prepareOptions(args, contract);
         const saveTo = prepareSaveTo(args);
         let maxPrice = null;
@@ -534,6 +536,64 @@ export function prepareImage(args, limits) {
         throw new Refusal(`image_path must be ${limits.formats.map((f) => f.replace('image/', '').toUpperCase()).join(', ')}.`);
     }
     return { body: { image_base64: bytes.toString('base64') }, identity: `sha256:${sha256(bytes)}` };
+}
+
+/**
+ * Exactly one of svg (the markup), svg_url (https) or svg_path (a local file, sent as svg), within
+ * Bacon's size limit. The file must be UTF-8 and hold an <svg>; Bacon checks the markup fully
+ * (well-formed, no entities, an <svg> root) before it quotes a price.
+ */
+export function prepareSvg(args, entry) {
+    const given = ['svg', 'svg_url', 'svg_path'].filter((name) => typeof args[name] === 'string' && args[name].trim() !== '');
+    if (given.length !== 1) {
+        throw new Refusal('Give exactly one of svg, svg_url or svg_path.');
+    }
+    const { max_bytes: maxBytes } = entry.limits;
+    if (given[0] === 'svg_url') {
+        const raw = args.svg_url.trim();
+        const maxLength = entry.input?.properties?.svg_url?.maxLength ?? 2048;
+        if (raw.length > maxLength) {
+            throw new Refusal(`svg_url is ${raw.length} characters; Bacon takes at most ${maxLength}.`);
+        }
+        let url;
+        try {
+            url = new URL(raw);
+        } catch {
+            throw new Refusal('svg_url is not a URL.');
+        }
+        if (url.protocol !== 'https:') {
+            throw new Refusal('svg_url must be a public https URL.');
+        }
+        return { body: { svg_url: url.href }, identity: `url:${url.href}` };
+    }
+    let markup;
+    if (given[0] === 'svg') {
+        markup = args.svg;
+    } else {
+        const path = resolve(args.svg_path.trim());
+        let size;
+        try {
+            size = statSync(path).size;
+        } catch {
+            throw new Refusal(`svg_path ${path} cannot be read.`);
+        }
+        if (size > maxBytes) {
+            throw new Refusal(`svg_path is ${size} bytes; Bacon takes at most ${maxBytes}.`);
+        }
+        try {
+            markup = new TextDecoder('utf-8', { fatal: true }).decode(readFileSync(path));
+        } catch {
+            throw new Refusal('svg_path must be a UTF-8 text file.');
+        }
+    }
+    const bytes = Buffer.byteLength(markup);
+    if (bytes > maxBytes) {
+        throw new Refusal(`The SVG is ${bytes} bytes; Bacon takes at most ${maxBytes}.`);
+    }
+    if (!markup.includes('<svg')) {
+        throw new Refusal(`${given[0]} does not hold an <svg> element.`);
+    }
+    return { body: { svg: markup }, identity: `sha256:${sha256(markup)}` };
 }
 
 /**

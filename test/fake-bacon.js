@@ -199,6 +199,11 @@ export function createFakeBacon({ networkKey = 'base', apiUrl = 'https://baconse
                 if (fake.tweak.hostBusyAtQuote) {
                     return json(503, { ok: false, code: 'busy', error: 'This site has been read too often in the last hour. Try again later.' });
                 }
+            } else if (id === 'svg-cleanup') {
+                const allowed = ['svg', 'svg_url', 'precision', 'simplify', 'keep_ids'];
+                if ((typeof body.svg === 'string') === (typeof body.svg_url === 'string') || Object.keys(body).some((key) => !allowed.includes(key))) {
+                    return json(422, { ok: false, code: 'invalid_input', error: 'Give exactly one of svg or svg_url.' });
+                }
             } else if (Boolean(body.image_url) === Boolean(body.image_base64)) {
                 return json(422, { ok: false, code: 'invalid_input', error: 'Give exactly one of image_url or image_base64.' });
             }

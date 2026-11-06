@@ -21,6 +21,7 @@ const NAMED_AS = {
     page_metadata: /SEO/,
     accessibility_check: /WCAG/,
     vectorize_image: /SVG/,
+    clean_svg: /clean/i,
 };
 
 test('the Registry entry is the npm package at its version', () => {

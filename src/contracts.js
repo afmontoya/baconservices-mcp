@@ -3,7 +3,7 @@
 // The live catalog decides what is FOR SALE (and at what price); this table decides what this
 // package will EXECUTE. A capability becomes a paid tool only when its catalog entry matches one
 // of these contracts exactly. A contract is the capability id, its behaviour `version`, its
-// `input_version` and `output_version`, an input type (one image, or one web page URL) with the
+// `input_version` and `output_version`, an input type (one image, one web page URL, or one SVG) with the
 // same option names, types, bounds and allowed values, an output (an artifact file of one MIME type, or a JSON
 // result), synchronous execution, and declared limits. Anything else — a new capability, a new
 // version, a changed schema, a catalog contract_version this package does not know — is still
@@ -14,9 +14,13 @@ export const SUPPORTED_CATALOG_VERSIONS = [1];
 
 export const IMAGE_FORMATS = ['image/png', 'image/jpeg', 'image/webp'];
 
+/** The input formats each input type may declare. A URL input declares the page's, unchecked here. */
+const FORMATS = { image: { allowed: IMAGE_FORMATS, label: 'PNG/JPEG/WebP' }, svg: { allowed: ['image/svg+xml'], label: 'SVG' } };
+
 const INPUTS = {
     image: { image_url: { type: 'string' }, image_base64: { type: 'string' } },
     url: { url: { type: 'string' } },
+    svg: { svg: { type: 'string' }, svg_url: { type: 'string' } },
 };
 
 export const CONTRACTS = [
@@ -117,13 +121,30 @@ export const CONTRACTS = [
         inputVersion: 1,
         outputVersion: 1,
         title: 'Vectorize image',
-        summary: 'Traces one PNG, JPEG or WebP image into an SVG of filled paths with up to colors flat colours. Best for logos, icons and flat artwork; a photo comes back as a stylised poster. The SVG keeps the image\'s width and height (capped at 4096).',
+        summary: 'Traces one PNG, JPEG or WebP image into an SVG of filled paths with up to colors flat colours. Best for logos, icons and flat artwork; a photo comes back as a stylised poster, and its SVG is larger than the photo (often two to three times a PNG of it at 16 colours; colors sets the size). The SVG keeps the image\'s width and height (capped at 4096).',
         input: 'image',
         options: {
-            colors: { type: 'integer', minimum: 2, maximum: 32, default: 16, description: 'How many flat colours to trace with. 2 is black and white.' },
+            colors: { type: 'integer', minimum: 2, maximum: 32, default: 16, description: 'How many flat colours to trace with. 2 is black and white. Fewer colours make a much smaller file; on a photo, 8 is about 40% of 16.' },
             detail: { type: 'string', enum: ['smooth', 'balanced', 'detailed'], default: 'balanced', description: 'smooth: fewer, simpler shapes. detailed: closer to the source, larger file.' },
         },
         output: { kind: 'artifact', mime: 'image/svg+xml' },
+        execution: 'sync',
+    },
+    {
+        tool: 'clean_svg',
+        id: 'svg-cleanup',
+        version: 1,
+        inputVersion: 1,
+        outputVersion: 1,
+        title: 'Clean SVG',
+        summary: 'Cleans and simplifies one SVG and returns it as JSON, with a report (bytes saved, what was removed, warnings). The SVG is rebuilt from an allowlist: scripts, event handlers, animation, links and references outside the file are removed; editor data, unused definitions, hidden and empty elements go; numbers are rounded and path data rewritten short. It looks the same unless simplify is light or strong. The cleaned SVG is result.svg.',
+        input: 'svg',
+        options: {
+            precision: { type: 'integer', minimum: 1, maximum: 6, default: 3, description: 'Decimals kept on coordinates. A drawing under 100 units across keeps one more per factor of ten.' },
+            simplify: { type: 'string', enum: ['none', 'light', 'strong'], default: 'none', description: 'none: looks the same. light or strong: points on straight runs move within 0.05% or 0.2% of the drawing\'s diagonal.' },
+            keep_ids: { type: 'boolean', default: false, description: 'Keep every id and class, for an SVG a page\'s own CSS or script uses.' },
+        },
+        output: { kind: 'json', mime: 'application/json' },
         execution: 'sync',
     },
 ];
@@ -223,9 +244,10 @@ export function checkEntry(entry, contract, expected) {
     if (!positive(limits.max_bytes)) {
         reasons.push('no maximum input size is declared');
     }
+    const formats = FORMATS[contract.input];
     if (!Array.isArray(limits.formats) || limits.formats.length === 0
-        || (contract.input === 'image' && limits.formats.some((f) => !IMAGE_FORMATS.includes(f)))) {
-        reasons.push(`input formats are missing${contract.input === 'image' ? ' or not PNG/JPEG/WebP' : ''}`);
+        || (formats && limits.formats.some((f) => !formats.allowed.includes(f)))) {
+        reasons.push(`input formats are missing${formats ? ` or not ${formats.label}` : ''}`);
     }
     if (!legacyCatalog && !positive(limits.max_request_bytes)) {
         reasons.push('no maximum request size is declared');

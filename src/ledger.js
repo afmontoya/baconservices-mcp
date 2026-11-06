@@ -24,11 +24,14 @@ const COUNTS = new Set(['reserved', 'spent', 'uncertain']);
 export class LedgerError extends Error {}
 
 export class Ledger {
-    constructor(dir, { now = () => Date.now() } = {}) {
+    constructor(dir, { now = () => Date.now(), openLock = openSync, platform = process.platform, lockWaitMs = LOCK_WAIT_MS } = {}) {
         this.dir = dir;
         this.file = join(dir, 'spend-ledger.json');
         this.lockFile = join(dir, 'spend-ledger.lock');
         this.now = now;
+        this.openLock = openLock;
+        this.platform = platform;
+        this.lockWaitMs = lockWaitMs;
     }
 
     /** Total that counts against the daily ceiling on this network, in atomic units. */
@@ -132,11 +135,18 @@ export class Ledger {
         const started = Date.now();
         for (;;) {
             try {
-                closeSync(openSync(this.lockFile, 'wx'));
+                closeSync(this.openLock(this.lockFile, 'wx'));
                 break;
             } catch (error) {
-                if (error.code !== 'EEXIST') {
-                    throw new LedgerError(`The spend ledger lock ${this.lockFile} cannot be created (${error.code}).`);
+                // On Windows, opening a lock file that another process is still deleting fails with
+                // EPERM, not EEXIST. Only a successful open takes the lock, so waiting is safe; an
+                // EPERM that outlasts the wait is a real permission problem and refuses like any other.
+                const held = error.code === 'EEXIST';
+                const contended = held || (error.code === 'EPERM' && this.platform === 'win32');
+                if (!contended || Date.now() - started > this.lockWaitMs) {
+                    throw new LedgerError(held
+                        ? `The spend ledger is locked by another process (${this.lockFile}).`
+                        : `The spend ledger lock ${this.lockFile} cannot be created (${error.code}).`);
                 }
                 try {
                     if (Date.now() - statSync(this.lockFile).mtimeMs > LOCK_STALE_MS) {
@@ -144,10 +154,7 @@ export class Ledger {
                         continue;
                     }
                 } catch {
-                    continue;
-                }
-                if (Date.now() - started > LOCK_WAIT_MS) {
-                    throw new LedgerError(`The spend ledger is locked by another process (${this.lockFile}).`);
+                    // Gone already, or it cannot be removed: wait, so the deadline still applies.
                 }
                 await new Promise((resolve) => setTimeout(resolve, 20));
             }
